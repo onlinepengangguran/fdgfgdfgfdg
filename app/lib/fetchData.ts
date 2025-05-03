@@ -10,7 +10,7 @@ export async function fetchDataWithCache() {
   }
 
   try {
-    const response = await fetch("https://a.cewe.pro/data.json")
+    const response = await fetch("https://akulakasa.pages.dev/data.json")
     cachedData = await response.json()
     lastFetchTime = currentTime
     return cachedData
