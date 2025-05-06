@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { NextResponse } from "next/server"
 import { fetchDataWithCache } from "@/app/lib/fetchData"
 import { setCorsHeaders } from "@/app/lib/cors"
