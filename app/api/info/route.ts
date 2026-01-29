@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { fetchStaticData } from "@/app/lib/fetchStaticData"
+import { getFileDetail } from "@/app/lib/fetchStaticData"
 import { setCorsHeaders } from "@/app/lib/cors"
 import { processTitle } from "@/app/lib/titleProcessor"
 
@@ -15,9 +15,8 @@ export async function GET(request: Request) {
   }
 
   try {
-    const data = await fetchStaticData()
-
-    const fileInfo = data.find((file: any) => file.filecode === fileCode)
+    // Load file detail hanya saat dibutuhkan (lazy loading)
+    const fileInfo = await getFileDetail(fileCode)
 
     if (!fileInfo) {
       const notFoundResponse = NextResponse.json({ error: "File not found" }, { status: 404 })
