@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { fetchDataWithCache } from "@/app/lib/fetchData"
+import { fetchStaticData } from "@/app/lib/fetchStaticData"
 import { setCorsHeaders } from "@/app/lib/cors"
 import { processTitle } from "@/app/lib/titleProcessor"
 
@@ -15,9 +15,9 @@ export async function GET(request: Request) {
   }
 
   try {
-    const data = await fetchDataWithCache()
+    const data = await fetchStaticData()
 
-    const fileInfo = data.find((file: any) => file.file_code === fileCode)
+    const fileInfo = data.find((file: any) => file.filecode === fileCode)
 
     if (!fileInfo) {
       const notFoundResponse = NextResponse.json({ error: "File not found" }, { status: 404 })
@@ -28,18 +28,17 @@ export async function GET(request: Request) {
       status: 200,
       result: [
         {
-          filecode: fileInfo.file_code,
-          size: fileInfo.size.toString(),
+          filecode: fileInfo.filecode,
+          size: fileInfo.size,
           status: 200,
           protected_embed: fileInfo.protected_embed,
           uploaded: fileInfo.uploaded,
           last_view: new Date().toISOString().replace("T", " ").substr(0, 19),
-          canplay: fileInfo.canplay ? 1 : 0,
           protected_dl: fileInfo.protected_dl,
           single_img: fileInfo.single_img,
           title: processTitle(fileInfo.title),
-          views: fileInfo.views.toString(),
-          length: fileInfo.length.toString(),
+          views: fileInfo.views,
+          length: fileInfo.length,
           splash_img: fileInfo.splash_img,
         },
       ],

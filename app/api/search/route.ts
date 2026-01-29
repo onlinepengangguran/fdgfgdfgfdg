@@ -1,7 +1,5 @@
-export const runtime = 'edge';
-
 import { NextResponse } from "next/server"
-import { fetchDataWithCache } from "@/app/lib/fetchData"
+import { fetchStaticData } from "@/app/lib/fetchStaticData"
 import { setCorsHeaders } from "@/app/lib/cors"
 import { processTitle } from "@/app/lib/titleProcessor"
 
@@ -19,12 +17,12 @@ export async function GET(request: Request) {
   }
 
   try {
-    const data = await fetchDataWithCache()
+    const data = await fetchStaticData()
     
     // Memisahkan query menjadi array kata-kata
     const keywords = query.toLowerCase().split(/\s+/).filter(Boolean)
     
-    // Membuat Set untuk menyimpan file_code yang sudah ditemukan agar tidak ada duplikat
+    // Membuat Set untuk menyimpan filecode yang sudah ditemukan agar tidak ada duplikat
     const seenFileCodes = new Set<string>()
     
     // Mencari hasil untuk setiap kata kunci
@@ -32,7 +30,7 @@ export async function GET(request: Request) {
       .filter((file: any) => {
         const titleLower = file.title.toLowerCase()
         // Hanya menyertakan file yang belum dilihat dan cocok dengan salah satu kata kunci
-        return !seenFileCodes.has(file.file_code) && 
+        return !seenFileCodes.has(file.filecode) && 
                keywords.some(keyword => titleLower.includes(keyword))
       })
       // Sort by relevance: number of keyword matches in title (descending)
@@ -52,17 +50,16 @@ export async function GET(request: Request) {
         return bMatches - aMatches
       })
       .map((file: any) => {
-        // Menambahkan file_code ke Set setelah diproses
-        seenFileCodes.add(file.file_code)
+        // Menambahkan filecode ke Set setelah diproses
+        seenFileCodes.add(file.filecode)
         return {
           single_img: file.single_img,
-          length: file.length.toString(),
-          views: file.views.toString(),
+          length: file.length,
+          views: file.views,
           title: processTitle(file.title),
-          file_code: file.file_code,
+          file_code: file.filecode,
           uploaded: file.uploaded,
           splash_img: file.splash_img,
-          canplay: file.canplay ? 1 : 0,
         }
       })
 

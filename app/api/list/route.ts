@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { fetchDataWithCache } from "@/app/lib/fetchData";
+import { fetchStaticData } from "@/app/lib/fetchStaticData";
 import { setCorsHeaders } from "@/app/lib/cors";
 import { processTitle } from "@/app/lib/titleProcessor";
 
@@ -9,15 +9,15 @@ export const revalidate = 86400; // Revalidate every 24 hours (1 day)
 interface File {
   single_img: string;
   title: string;
-  file_code: string;
+  filecode: string;
   uploaded: string;
-  canplay: number; // Note: In the JSON, `canplay` is a number (1 or 0)
-  download_url: string;
-  views: string; // Note: In the JSON, `views` is a string
-  fld_id: string;
+  views: string;
+  length: string;
+  protected_embed: string;
+  protected_dl: string;
   splash_img: string;
-  public: string;
-  length: string; // Note: In the JSON, `length` is a string
+  size: string;
+  duration: string;
 }
 
 export async function GET(request: Request) {
@@ -26,7 +26,7 @@ export async function GET(request: Request) {
   const perPage = Number.parseInt(searchParams.get("per_page") || "50");
 
   try {
-    const data = await fetchDataWithCache();
+    const data = await fetchStaticData();
 
     const startIndex = (page - 1) * perPage;
     const endIndex = startIndex + perPage;
@@ -38,16 +38,12 @@ export async function GET(request: Request) {
         results_total: data.length.toString(),
         results: paginatedFiles.length,
         files: paginatedFiles.map((file: File) => ({
-          public: file.public,
           single_img: file.single_img,
-          canplay: file.canplay,
           uploaded: file.uploaded,
           views: file.views,
           length: file.length,
-          download_url: file.download_url,
-          file_code: file.file_code,
+          file_code: file.filecode,
           title: processTitle(file.title),
-          fld_id: file.fld_id,
           splash_img: file.splash_img,
         })),
         per_page_limit: perPage.toString(),
